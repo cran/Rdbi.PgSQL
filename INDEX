@@ -1,0 +1,22 @@
+PgSQL                    Return an object of type PgSQL
+dbAppendTable.PgSQL.conn
+                         Append data to a PgSQL table
+dbClearResult.PgSQL.result
+                         Clear results
+dbColumnInfo.PgSQL.result
+                         Return column information
+dbConnect.PgSQL          Connect to PostgreSQL backend
+dbConnectionInfo.PgSQL.conn
+                         Return connection information
+dbDisconnect.PgSQL.conn  Drop a connection
+dbGetQuery.PgSQL.conn    Submit a query and fetch result
+dbGetResult.PgSQL.result
+                         Fetch results from a query
+dbListTables.PgSQL.conn  List tables in a database
+dbReadTable.PgSQL.conn   Read a PostgreSQL table
+dbResultInfo.PgSQL.result
+                         Get result information
+dbSendQuery.PgSQL.conn   Send a query to the backend
+dbWriteTable.PgSQL.conn  Write a data frame to a database
+Internal functions       Internal function
+psql                     Run the PostgreSQL monitor

@@ -1,0 +1,88 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/PgSQL.c)
+
+dnl Checks for libraries.
+
+dnl Check for lib crypt (not necessary)
+dnl AC_CHECK_LIB(crypt, crypt, PKG_LIBS=-lcrypt,
+dnl             echo No crypt function found; exit 1)
+
+dnl See if user specified library directory
+if test $PG_LIB_DIR
+then
+	PKG_LIBS="${PKG_LIBS} -L${PG_LIB_DIR} -lpq"
+else
+	AC_ARG_WITH(pgsql-libraries,
+		    --with-pgsql-libraries    sets path to libpq library,
+		    PKG_LIBS="${PKG_LIBS} -L${withval} -lpq",
+		    NO_USER_PKG_LIB_ARGS=1)
+fi
+
+dnl If not, look for it
+if test $NO_USER_PKG_LIB_ARGS
+then
+	AC_CHECK_LIB(pq, PQconnectdb,
+                     PKG_LIBS="${PKG_LIBS} -lpq",
+                     NO_LIBPQ=1)
+fi
+
+if test $NO_LIBPQ
+then
+	echo
+	echo I could not find your PostgreSQL client libraries\!
+	echo Use --with-pgsql-libraries=PATH\; if running R\'s INSTALL\, 
+	echo use --configure-args=\'--with-pgsql-libraries=PATH\'\; or
+	echo set PG_LIB_DIR in your environment to the library path\,
+	echo and rerun the configure/install\.
+	echo
+	exit 1;
+fi
+
+dnl If not user specified location, look around
+if ! test $PG_INCLUDE_DIR
+then
+	for dir in \
+	/usr/include \
+	/usr/include/pgsql \
+	/usr/include/postgresql \
+	/usr/local/include \
+	/usr/local/include/pgsql \
+	/usr/local/include/postgresql \
+	/opt/include \
+	/opt/include/pgsql \
+	/opt/include/postgresql
+	do
+		AC_CHECK_HEADERS(${dir}/libpq-fe.h, PG_INCLUDE_DIR=${dir})
+		if test $PG_INCLUDE_DIR
+		then
+			break
+		fi
+	done
+fi
+
+dnl Check for user args
+if test $PG_INCLUDE_DIR
+then
+	PKG_CPPFLAGS=-I${PG_INCLUDE_DIR}
+else
+	AC_ARG_WITH(pgsql-includes,
+                    --with-pgsql-includes     sets path to libpq header,
+                    PKG_CPPFLAGS=-I${withval},
+		    PG_INCLUDE_DIR_NOT_FOUND=1)
+fi
+
+if test $PG_INCLUDE_DIR_NOT_FOUND
+then
+	echo
+	echo I could not find your PostgreSQL client headers\!
+	echo Use --with-pgsql-includes=PATH\; if running R\'s INSTALL\, 
+	echo use --configure-args=\'--with-pgsql-includes=PATH\'\; or
+	echo set PG_INCLUDE_DIR in your environment to the library path\,
+	echo and rerun the configure/install\.
+	echo
+	exit 1;
+fi
+
+AC_SUBST(PKG_CPPFLAGS)
+AC_SUBST(PKG_LIBS)
+AC_OUTPUT(src/Makevars)
